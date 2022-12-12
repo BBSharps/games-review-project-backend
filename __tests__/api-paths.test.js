@@ -1,11 +1,11 @@
 const request = require("supertest");
 const { app } = require("../db/api/api");
+const seed = require("../db/seeds/seed");
+const testData = require("../db/data/test-data/index");
+const db = require("../db/connection");
 
-describe("GET /api", () => {
-  test("status:200", () => {
-    return request(app).get("/api").expect(200);
-  });
-});
+beforeEach(() => seed(testData));
+afterAll(() => db.end());
 
 describe("GET /api/categories", () => {
   test("status:200 should return an array of objects each withn slug and description", () => {
@@ -14,15 +14,26 @@ describe("GET /api/categories", () => {
       .expect(200)
       .then((data) => {
         const result = data.body.categories;
-        expect(result[0]).toEqual(
-          expect.objectContaining({
-            slug: expect.any(String),
-            description: expect.any(String),
-          })
+        expect(result).toEqual(
+          expect.objectContaining([
+            {
+              slug: expect.any(String),
+              description: expect.any(String),
+            },
+          ])
         );
       });
   });
-  test.only("status:404 when serching for an incorret path", () => {
+  test("should return the whole data set. ", () => {
+    return request(app)
+      .get("/api/categories")
+      .expect(200)
+      .then((data) => {
+        const result = data.body.categories;
+        expect(result.length).toBe(4);
+      });
+  });
+  test("status:404 when serching for an incorret path", () => {
     return request(app)
       .get("/api/catago")
       .expect(404)

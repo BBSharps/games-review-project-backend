@@ -1,5 +1,4 @@
 exports.handle404 = (req, res, next) => {
-  console.log("in 404");
   res.status(404).send({ msg: "Path not found" });
 };
 
