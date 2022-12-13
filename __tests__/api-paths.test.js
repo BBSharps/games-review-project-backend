@@ -60,12 +60,12 @@ describe("GET /api/reviews", () => {
               title: expect.any(String),
               designer: expect.any(String),
               owner: expect.any(String),
-              review_body: expect.any(String),
               review_id: expect.any(Number),
               review_img_url: expect.any(String),
               category: expect.any(String),
               created_at: expect.any(String),
               votes: expect.any(Number),
+              comment_count: expect.any(String),
             })
           );
         });
@@ -78,6 +78,16 @@ describe("GET /api/reviews", () => {
       .then((data) => {
         const result = data.body.reviews;
         expect(result.length).toBe(13);
+      });
+  });
+  test("the reviews that have comments should have the correct ammount of comments", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((data) => {
+        const result = data.body.reviews;
+        expect(result[1].comment_count).toBe("3");
+        expect(result[2].comment_count).toBe("3");
       });
   });
 });
