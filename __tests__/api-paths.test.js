@@ -3,6 +3,7 @@ const { app } = require("../db/api/api");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data/index");
 const db = require("../db/connection");
+const categories = require("../db/data/test-data/categories");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -14,14 +15,14 @@ describe("GET /api/categories", () => {
       .expect(200)
       .then((data) => {
         const result = data.body.categories;
-        expect(result).toEqual(
-          expect.objectContaining([
-            {
+        result.forEach((category) => {
+          expect(category).toEqual(
+            expect.objectContaining({
               slug: expect.any(String),
               description: expect.any(String),
-            },
-          ])
-        );
+            })
+          );
+        });
       });
   });
   test("should return the whole data set. ", () => {
