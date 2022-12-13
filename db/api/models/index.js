@@ -10,19 +10,22 @@ exports.selectCategories = () => {
 exports.selectReviews = () => {
   return db
     .query(
-      `SELECT  title,
+      `SELECT 
+  title,
   designer,
   owner,
-  review_id,
+  reviews.review_id,
   review_img_url ,
   category,
-  created_at,
-  votes, 
+  reviews.created_at,
+  reviews.votes, 
   COALESCE((SELECT COUNT(review_id)
 FROM comments
 WHERE review_id = reviews.review_id),0) AS comment_count
   FROM reviews
-  ORDER BY created_at DESC`
+  LEFT JOIN comments ON reviews.review_id = comments.review_id
+  GROUP BY reviews.review_id
+  ORDER BY reviews.created_at DESC`
     )
     .then((response) => {
       return response.rows;
