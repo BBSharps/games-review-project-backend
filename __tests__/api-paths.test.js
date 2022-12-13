@@ -34,12 +34,50 @@ describe("GET /api/categories", () => {
         expect(result.length).toBe(4);
       });
   });
+});
+
+describe("error handeling", () => {
   test("status:404 when serching for an incorret path", () => {
     return request(app)
-      .get("/api/catago")
+      .get("/api/not_a_path")
       .expect(404)
       .then((data) => {
         expect(data.body.msg).toBe("Path not found");
+      });
+  });
+});
+
+describe("GET /api/reviews", () => {
+  test("status: 200 returns an array with review objects", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((data) => {
+        const reviews = data.body.reviews;
+        reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              title: expect.any(String),
+              designer: expect.any(String),
+              owner: expect.any(String),
+              review_body: expect.any(String),
+              review_id: expect.any(Number),
+              review_img_url: expect.any(String),
+              category: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+  test("should return the whole data set. ", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then((data) => {
+        const result = data.body.reviews;
+        expect(result.length).toBe(13);
       });
   });
 });
