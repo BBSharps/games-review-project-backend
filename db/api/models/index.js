@@ -13,15 +13,16 @@ exports.selectReviews = () => {
       `SELECT  title,
   designer,
   owner,
-  reviews.review_id,
+  review_id,
   review_img_url ,
   category,
-  reviews.created_at,
-  reviews.votes, 
+  created_at,
+  votes, 
   COALESCE((SELECT COUNT(review_id)
 FROM comments
 WHERE review_id = reviews.review_id),0) AS comment_count
-  FROM reviews`
+  FROM reviews
+  ORDER BY created_at DESC`
     )
     .then((response) => {
       return response.rows;

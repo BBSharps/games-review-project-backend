@@ -4,6 +4,7 @@ const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data/index");
 const db = require("../db/connection");
 const categories = require("../db/data/test-data/categories");
+const { toBeSortedBy } = require("");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -86,8 +87,24 @@ describe("GET /api/reviews", () => {
       .expect(200)
       .then((data) => {
         const result = data.body.reviews;
-        expect(result[1].comment_count).toBe("3");
-        expect(result[2].comment_count).toBe("3");
+        const filteredReview = result.filter((review) => {
+          return review.comment_count === "3";
+        });
+        filteredReview.forEach((filtered) => {
+          expect(filtered).toEqual(
+            expect.objectContaining({
+              comment_count: "3",
+            })
+          );
+        });
+      });
+  });
+  test("the results should be sorted buy created_at in descending order", () => {
+    return request(app)
+      .get("/api/reviews")
+      .then((data) => {
+        const result = data.body.reviews;
+        expect(result).toBeSortedBy("created_at", { descending: true });
       });
   });
 });
