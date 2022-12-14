@@ -14,7 +14,7 @@ exports.getReviews = (req, res, next) => {
   selectReviews(review_id)
     .then((reviews) => {
       if (reviews.length === 0) {
-        return Promise.reject({ status: 400, msg: "not a valid id" });
+        return Promise.reject({ status: 404, msg: "not a valid id" });
       } else {
         res.send({ reviews: reviews });
       }

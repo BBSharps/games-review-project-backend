@@ -130,18 +130,16 @@ describe("GET /api/reviews/:review_id", () => {
         expect(result.length).toBe(1);
       });
   });
+  test("status:404 when serching for a missing id in reviews", () => {
+    return request(app).get("/api/reviews/92").expect(404);
+  });
+  test("status:400 when serching for an invalid id", () => {
+    return request(app).get("/api/reviews/banana").expect(400);
+  });
 });
 
 describe("error handeling", () => {
   test("status:404 when serching for an incorret path", () => {
-    return request(app)
-      .get("/api/not_a_path")
-      .expect(404)
-      .then((data) => {
-        expect(data.body.msg).toBe("Path not found");
-      });
-  });
-  test("status:400 when serching for a missing id in reviews", () => {
-    return request(app).get("/api/reviews/92").expect(400);
+    return request(app).get("/api/not_a_path").expect(404);
   });
 });
