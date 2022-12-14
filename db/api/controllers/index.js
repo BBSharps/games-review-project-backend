@@ -14,7 +14,7 @@ exports.getReviews = (req, res, next) => {
   selectReviews(review_id)
     .then((reviews) => {
       if (reviews.length === 0) {
-        res.status(400).send({ msg: "review_id not found" });
+        return Promise.reject({ status: 400, msg: "not a valid id" });
       } else {
         res.send({ reviews: reviews });
       }

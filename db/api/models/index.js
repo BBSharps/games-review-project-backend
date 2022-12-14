@@ -26,7 +26,7 @@ exports.selectReviews = (review_id) => {
   ORDER BY reviews.created_at DESC`;
   let selectReviewId = `review_body
   FROM reviews 
-   WHERE review_id = $1`;
+  WHERE review_id = $1`;
   if (review_id != undefined) {
     select.push(review_id);
     allReviews += selectReviewId;

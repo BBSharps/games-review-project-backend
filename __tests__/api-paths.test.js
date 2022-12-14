@@ -144,7 +144,4 @@ describe("error handeling", () => {
   test("status:400 when serching for a missing id in reviews", () => {
     return request(app).get("/api/reviews/92").expect(400);
   });
-  test("status:400 when serching for an in valid id in reviews", () => {
-    return request(app).get("/api/reviews/bannana").expect(400);
-  });
 });
