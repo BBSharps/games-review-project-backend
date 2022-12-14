@@ -38,3 +38,18 @@ exports.selectReviews = (review_id) => {
     return response.rows;
   });
 };
+
+exports.selectReviewComments = (review_id) => {
+  return db
+    .query(
+      `SELECT comment_id,comments.votes,comments.created_at,author,body, comments.review_id FROM reviews
+  LEFT JOIN comments ON reviews.review_id = comments.review_id
+  WHERE reviews.review_id = $1
+  ORDER BY comments.created_at DESC
+ `,
+      [review_id]
+    )
+    .then((comments) => {
+      return comments.rows;
+    });
+};
