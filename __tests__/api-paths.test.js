@@ -131,10 +131,20 @@ describe("GET /api/reviews/:review_id", () => {
       });
   });
   test("status:404 when serching for a missing id in reviews", () => {
-    return request(app).get("/api/reviews/92").expect(404);
+    return request(app)
+      .get("/api/reviews/92")
+      .expect(404)
+      .then((data) => {
+        expect(data._body.msg).toBe("not a valid id");
+      });
   });
   test("status:400 when serching for an invalid id", () => {
-    return request(app).get("/api/reviews/banana").expect(400);
+    return request(app)
+      .get("/api/reviews/banana")
+      .expect(400)
+      .then((data) => {
+        expect(data._body.msg).toBe("bad request");
+      });
   });
 });
 
