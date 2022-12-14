@@ -10,9 +10,14 @@ exports.getCategories = (req, res, next) => {
 };
 
 exports.getReviews = (req, res, next) => {
-  selectReviews()
+  const review_id = req.params.review_id;
+  selectReviews(review_id)
     .then((reviews) => {
-      res.send({ reviews: reviews });
+      if (reviews.length === 0) {
+        return Promise.reject({ status: 404, msg: "not a valid id" });
+      } else {
+        res.send({ reviews: reviews });
+      }
     })
     .catch((err) => {
       next(err);
