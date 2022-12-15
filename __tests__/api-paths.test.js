@@ -1,5 +1,5 @@
 const request = require("supertest");
-const { app } = require("../db/api/api");
+const { app } = require("../api/api");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data/index");
 const db = require("../db/connection");
@@ -103,22 +103,20 @@ describe("GET /api/reviews/:review_id", () => {
       .get("/api/reviews/3")
       .expect(200)
       .then((data) => {
-        const reviews = data.body.reviews;
-        reviews.forEach((review) => {
-          expect(review).toEqual(
-            expect.objectContaining({
-              title: expect.any(String),
-              designer: expect.any(String),
-              owner: expect.any(String),
-              review_id: 3,
-              review_img_url: expect.any(String),
-              category: expect.any(String),
-              created_at: expect.any(String),
-              votes: expect.any(Number),
-              review_body: expect.any(String),
-            })
-          );
-        });
+        const review = data.body.reviewId;
+        expect(review).toEqual(
+          expect.objectContaining({
+            title: expect.any(String),
+            designer: expect.any(String),
+            owner: expect.any(String),
+            review_id: 3,
+            review_img_url: expect.any(String),
+            category: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            review_body: expect.any(String),
+          })
+        );
       });
   });
   test("should return only the required review", () => {
@@ -126,8 +124,8 @@ describe("GET /api/reviews/:review_id", () => {
       .get("/api/reviews/4")
       .expect(200)
       .then((data) => {
-        const result = data.body.reviews;
-        expect(result.length).toBe(1);
+        const result = data.body.reviewId;
+        expect(result.review_id).toBe(4);
       });
   });
   test("status:404 when serching for a missing id in reviews", () => {
@@ -155,9 +153,8 @@ describe("GET /api/reviews/:review_id/comments", () => {
       .expect(200)
       .then((data) => {
         const reviews = data.body.comments;
-        console.log(reviews);
-        reviews.forEach((review) => {
-          expect(review).toEqual(
+        reviews.forEach((comment) => {
+          expect(comment).toEqual(
             expect.objectContaining({
               comment_id: expect.any(Number),
               votes: expect.any(Number),
@@ -175,9 +172,9 @@ describe("GET /api/reviews/:review_id/comments", () => {
       .get("/api/reviews/3/comments")
       .expect(200)
       .then((data) => {
-        const reviews = data.body.comments;
-        expect(reviews).toBeSortedBy("created_at", { descending: true });
-        expect(reviews).toHaveLength(3);
+        const comments = data.body.comments;
+        expect(comments).toBeSortedBy("created_at", { descending: true });
+        expect(comments).toHaveLength(3);
       });
   });
   test("status: 200,if a valid id is given but there are no comments", () => {
@@ -185,8 +182,8 @@ describe("GET /api/reviews/:review_id/comments", () => {
       .get("/api/reviews/1/comments")
       .expect(200)
       .then((data) => {
-        const reviews = data.body.comments;
-        expect(reviews).toHaveLength(0);
+        const comments = data.body.comments;
+        expect(comments).toHaveLength(0);
       });
   });
   test("status:404 when serching for a missing id in reviews", () => {
