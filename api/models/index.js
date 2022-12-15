@@ -64,3 +64,16 @@ exports.selectReviewComments = (review_id) => {
       return comments.rows;
     });
 };
+exports.newComment = (review_id, author, body) => {
+  let date = new Date();
+  return db
+    .query(
+      `INSERT INTO comments (body,votes,author,review_id,created_at)
+      VALUES
+      ($3,0,$2,$1,$4) RETURNING *`,
+      [review_id, author, body, date]
+    )
+    .then((res) => {
+      return res.rows[0];
+    });
+};

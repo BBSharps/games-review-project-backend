@@ -203,6 +203,45 @@ describe("GET /api/reviews/:review_id/comments", () => {
       });
   });
 });
+describe("POST /api/reviews/:revied_id/comments", () => {
+  test("should be able to take a username and a body as input and post a new comment with the review_id matching the url", () => {
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send({ userName: "dav3rid", body: "Rubarb,rubarb,rubarb" })
+      .expect(201)
+      .then((data) => {
+        const newComment = data.body.comment;
+        expect(newComment).toEqual(
+          expect.objectContaining({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            review_id: 1,
+          })
+        );
+      });
+  });
+  test("status:404 when serching for an invalid id in reviews", () => {
+    return request(app)
+      .post("/api/reviews/38/comments")
+      .send({ userName: "dav3rid", body: "Rubarb,rubarb,rubarb" })
+      .expect(404)
+      .then((data) => {
+        expect(data._body.msg).toBe("not a valid id");
+      });
+  });
+  test("status:400 when serching for an invalid id", () => {
+    return request(app)
+      .post("/api/reviews/banana/comments")
+      .send({ userName: "dav3rid", body: "Rubarb,rubarb,rubarb" })
+      .expect(400)
+      .then((data) => {
+        expect(data._body.msg).toBe("bad request");
+      });
+  });
+});
 
 describe("error handling", () => {
   test("status:404 when serching for an incorret path", () => {
