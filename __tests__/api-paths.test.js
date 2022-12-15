@@ -1,5 +1,5 @@
 const request = require("supertest");
-const { app } = require("../db/api/api");
+const { app } = require("../api/api");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data/index");
 const db = require("../db/connection");
@@ -103,22 +103,20 @@ describe("GET /api/reviews/:review_id", () => {
       .get("/api/reviews/3")
       .expect(200)
       .then((data) => {
-        const reviews = data.body.reviews;
-        reviews.forEach((review) => {
-          expect(review).toEqual(
-            expect.objectContaining({
-              title: expect.any(String),
-              designer: expect.any(String),
-              owner: expect.any(String),
-              review_id: 3,
-              review_img_url: expect.any(String),
-              category: expect.any(String),
-              created_at: expect.any(String),
-              votes: expect.any(Number),
-              review_body: expect.any(String),
-            })
-          );
-        });
+        const review = data.body.reviewId;
+        expect(review).toEqual(
+          expect.objectContaining({
+            title: expect.any(String),
+            designer: expect.any(String),
+            owner: expect.any(String),
+            review_id: 3,
+            review_img_url: expect.any(String),
+            category: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            review_body: expect.any(String),
+          })
+        );
       });
   });
   test("should return only the required review", () => {
@@ -126,8 +124,8 @@ describe("GET /api/reviews/:review_id", () => {
       .get("/api/reviews/4")
       .expect(200)
       .then((data) => {
-        const result = data.body.reviews;
-        expect(result.length).toBe(1);
+        const result = data.body.reviewId;
+        expect(result.review_id).toBe(4);
       });
   });
   test("status:404 when serching for a missing id in reviews", () => {
@@ -148,7 +146,65 @@ describe("GET /api/reviews/:review_id", () => {
   });
 });
 
-describe("error handeling", () => {
+describe("GET /api/reviews/:review_id/comments", () => {
+  test("status: 200 returns an array with the comment objects", () => {
+    return request(app)
+      .get("/api/reviews/3/comments")
+      .expect(200)
+      .then((data) => {
+        const reviews = data.body.comments;
+        reviews.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+              review_id: 3,
+            })
+          );
+        });
+      });
+  });
+  test("comments should be ordered from newest to oldest and return the correct ammount", () => {
+    return request(app)
+      .get("/api/reviews/3/comments")
+      .expect(200)
+      .then((data) => {
+        const comments = data.body.comments;
+        expect(comments).toBeSortedBy("created_at", { descending: true });
+        expect(comments).toHaveLength(3);
+      });
+  });
+  test("status: 200,if a valid id is given but there are no comments", () => {
+    return request(app)
+      .get("/api/reviews/1/comments")
+      .expect(200)
+      .then((data) => {
+        const comments = data.body.comments;
+        expect(comments).toHaveLength(0);
+      });
+  });
+  test("status:404 when serching for a missing id in reviews", () => {
+    return request(app)
+      .get("/api/reviews/92/comments")
+      .expect(404)
+      .then((data) => {
+        expect(data._body.msg).toBe("not a valid id");
+      });
+  });
+  test("status:400 when serching for an invalid id", () => {
+    return request(app)
+      .get("/api/reviews/banana/comments")
+      .expect(400)
+      .then((data) => {
+        expect(data._body.msg).toBe("bad request");
+      });
+  });
+});
+
+describe("error handling", () => {
   test("status:404 when serching for an incorret path", () => {
     return request(app).get("/api/not_a_path").expect(404);
   });
