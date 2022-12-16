@@ -4,6 +4,7 @@ const {
   selectReviewId,
   selectReviewComments,
   newComment,
+  selectUsers,
 } = require("../models/index");
 exports.getCategories = (req, res, next) => {
   selectCategories()
@@ -64,6 +65,7 @@ exports.postComment = (req, res, next) => {
       res.status(201).send({ comment: results });
     })
     .catch((err) => {
+      console.log(err);
       next(err);
     });
 };
