@@ -10,16 +10,9 @@ exports.getReviews = (req, res, next) => {
   const category = req.query.category;
   const sort_by = req.query.sorted_by;
   let order = req.query.order;
-  if (order !== "asc") {
-    order = "desc";
-  }
   selectReviews(category, sort_by, order)
     .then((reviews) => {
-      if (reviews.length === 0) {
-        return Promise.reject({ status: 404, msg: "not a valid request" });
-      } else {
-        res.send({ reviews: reviews });
-      }
+      res.send({ reviews: reviews });
     })
     .catch((err) => {
       next(err);

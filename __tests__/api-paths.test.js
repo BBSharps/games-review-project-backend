@@ -168,7 +168,7 @@ describe("GET /api/reviews", () => {
       .get("/api/reviews?category=banana")
       .expect(404)
       .then((data) => {
-        expect(data._body.msg).toBe("not a valid request");
+        expect(data._body.msg).toBe("not found");
       });
   });
   test("status:400 when given an invalid column to sort by", () => {
@@ -176,11 +176,16 @@ describe("GET /api/reviews", () => {
       .get("/api/reviews?sorted_by=banana")
       .expect(400)
       .then((data) => {
-        expect(data._body.msg).toBe("not a valid input");
+        expect(data._body.msg).toBe("not a valid request");
       });
   });
-  test("status:200 when given an invalid order", () => {
-    return request(app).get("/api/reviews?order=banana").expect(200);
+  test("status:400 when given an invalid order", () => {
+    return request(app)
+      .get("/api/reviews?order=banana")
+      .expect(400)
+      .then((data) => {
+        expect(data._body.msg).toBe("not a valid request");
+      });
   });
 });
 describe("GET /api/reviews/:review_id", () => {

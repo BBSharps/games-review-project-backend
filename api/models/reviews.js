@@ -3,12 +3,23 @@ const db = require("../../db/connection");
 
 exports.selectReviews = (category, sort_by, order) => {
   const querys = [];
-  if (sort_by !== undefined) {
-    if (["title", "designer", "owner", "category", "votes"].includes(sort_by)) {
-      sort_by = sort_by;
-    }
-  } else {
-    sort_by = `reviews.created_at`;
+  if (order === undefined) order = `desc`;
+  if (sort_by === undefined) sort_by = `reviews.created_at`;
+  if (!["asc", "desc"].includes(order)) {
+    return Promise.reject({ status: 400, msg: "not a valid request" });
+  }
+
+  if (
+    ![
+      "title",
+      "designer",
+      "owner",
+      "category",
+      "votes",
+      "reviews.created_at",
+    ].includes(sort_by)
+  ) {
+    return Promise.reject({ status: 400, msg: "not a valid request" });
   }
   let reviews = `SELECT 
   title,
@@ -26,17 +37,16 @@ exports.selectReviews = (category, sort_by, order) => {
   `;
   let orderByText = `GROUP BY reviews.review_id 
   ORDER BY ${sort_by}`;
-  if (category !== undefined) {
+  if (category) {
     reviews += ` WHERE category = $1`;
     querys.push(category);
   }
-  if (order === "asc") {
-    reviews += orderByText += ` ASC`;
-  } else {
-    reviews += orderByText += ` DESC`;
-  }
+
+  reviews += orderByText += ` ${order}`;
 
   return db.query(reviews, querys).then((reviews) => {
+    if (reviews.rows.length === 0)
+      return Promise.reject({ status: 404, msg: "not found" });
     return reviews.rows;
   });
 };
@@ -57,6 +67,7 @@ exports.selectReviewId = (review_id) => {
       [review_id]
     )
     .then((review) => {
+      console.log(review.rows);
       return review.rows;
     });
 };
