@@ -128,7 +128,7 @@ describe("GET /api/reviews/:review_id", () => {
         expect(result.review_id).toBe(4);
       });
   });
-  test("status:404 when serching for a missing id in reviews", () => {
+  test("status:404 when serching for an invalid id in reviews", () => {
     return request(app)
       .get("/api/reviews/92")
       .expect(404)
@@ -136,7 +136,7 @@ describe("GET /api/reviews/:review_id", () => {
         expect(data._body.msg).toBe("not a valid id");
       });
   });
-  test("status:400 when serching for an invalid id", () => {
+  test("status:400 when serching for a bad request", () => {
     return request(app)
       .get("/api/reviews/banana")
       .expect(400)
@@ -186,7 +186,7 @@ describe("GET /api/reviews/:review_id/comments", () => {
         expect(comments).toHaveLength(0);
       });
   });
-  test("status:404 when serching for a missing id in reviews", () => {
+  test("status:404 when serching for an invalid id in reviews", () => {
     return request(app)
       .get("/api/reviews/92/comments")
       .expect(404)
@@ -194,7 +194,7 @@ describe("GET /api/reviews/:review_id/comments", () => {
         expect(data._body.msg).toBe("not a valid id");
       });
   });
-  test("status:400 when serching for an invalid id", () => {
+  test("status:400 when serching for a bad request", () => {
     return request(app)
       .get("/api/reviews/banana/comments")
       .expect(400)
@@ -232,7 +232,7 @@ describe("POST /api/reviews/:revied_id/comments", () => {
         expect(data._body.msg).toBe("not a valid id");
       });
   });
-  test("status:400 when serching for an invalid id", () => {
+  test("status:400 when serching for a bad request", () => {
     return request(app)
       .post("/api/reviews/banana/comments")
       .send({ userName: "dav3rid", body: "Rubarb,rubarb,rubarb" })
