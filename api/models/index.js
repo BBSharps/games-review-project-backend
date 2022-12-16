@@ -77,3 +77,16 @@ exports.newComment = (review_id, author, body) => {
       return res.rows[0];
     });
 };
+exports.increaseVote = (review_id, votes) => {
+  return db
+    .query(
+      `UPDATE reviews
+      SET votes = votes + $2
+      WHERE review_id = $1
+      RETURNING *`,
+      [review_id, votes]
+    )
+    .then((res) => {
+      return res.rows[0];
+    });
+};
