@@ -3,6 +3,8 @@ const {
   selectReviews,
   selectReviewId,
   selectReviewComments,
+  newComment,
+  selectUsers,
 } = require("../models/index");
 exports.getCategories = (req, res, next) => {
   selectCategories()
@@ -51,6 +53,19 @@ exports.getReviewIdComments = (req, res, next) => {
       res.send({ comments: results[1] });
     })
     .catch((err) => {
+      next(err);
+    });
+};
+exports.postComment = (req, res, next) => {
+  const author = req.body.userName;
+  const body = req.body.body;
+  const review_id = req.params.review_id;
+  newComment(review_id, author, body)
+    .then((results) => {
+      res.status(201).send({ comment: results });
+    })
+    .catch((err) => {
+      console.log(err);
       next(err);
     });
 };

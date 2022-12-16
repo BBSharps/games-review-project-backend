@@ -128,7 +128,7 @@ describe("GET /api/reviews/:review_id", () => {
         expect(result.review_id).toBe(4);
       });
   });
-  test("status:404 when serching for a missing id in reviews", () => {
+  test("status:404 when serching for an invalid id in reviews", () => {
     return request(app)
       .get("/api/reviews/92")
       .expect(404)
@@ -136,7 +136,7 @@ describe("GET /api/reviews/:review_id", () => {
         expect(data._body.msg).toBe("not a valid id");
       });
   });
-  test("status:400 when serching for an invalid id", () => {
+  test("status:400 when serching for a bad request", () => {
     return request(app)
       .get("/api/reviews/banana")
       .expect(400)
@@ -186,7 +186,7 @@ describe("GET /api/reviews/:review_id/comments", () => {
         expect(comments).toHaveLength(0);
       });
   });
-  test("status:404 when serching for a missing id in reviews", () => {
+  test("status:404 when serching for an invalid id in reviews", () => {
     return request(app)
       .get("/api/reviews/92/comments")
       .expect(404)
@@ -194,12 +194,78 @@ describe("GET /api/reviews/:review_id/comments", () => {
         expect(data._body.msg).toBe("not a valid id");
       });
   });
-  test("status:400 when serching for an invalid id", () => {
+  test("status:400 when serching for a bad request", () => {
     return request(app)
       .get("/api/reviews/banana/comments")
       .expect(400)
       .then((data) => {
         expect(data._body.msg).toBe("bad request");
+      });
+  });
+});
+describe("POST /api/reviews/:revied_id/comments", () => {
+  test("should be able to take a username and a body as input and post a new comment with the review_id matching the url", () => {
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send({ userName: "dav3rid", body: "Rubarb,rubarb,rubarb" })
+      .expect(201)
+      .then((data) => {
+        const newComment = data.body.comment;
+        expect(newComment).toEqual(
+          expect.objectContaining({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            review_id: 1,
+          })
+        );
+      });
+  });
+  test("status: 400 if any of the request data is missing", () => {
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send({ body: "Rubarb,rubarb,rubarb" })
+      .expect(400)
+      .then((data) => {
+        expect(data._body.msg).toBe("missing information in POST request");
+      });
+  });
+  test("status: 400 if any of the request data is missing", () => {
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send({ userName: "dav3rid" })
+      .expect(400)
+      .then((data) => {
+        expect(data._body.msg).toBe("missing information in POST request");
+      });
+  });
+  test("status:404 when serching for an invalid id in reviews", () => {
+    return request(app)
+      .post("/api/reviews/38/comments")
+      .send({ userName: "dav3rid", body: "Rubarb,rubarb,rubarb" })
+      .expect(404)
+      .then((data) => {
+        expect(data._body.msg).toBe("not a valid input");
+      });
+  });
+  test("status:400 when serching for a bad request", () => {
+    return request(app)
+      .post("/api/reviews/banana/comments")
+      .send({ userName: "dav3rid", body: "Rubarb,rubarb,rubarb" })
+      .expect(400)
+      .then((data) => {
+        expect(data._body.msg).toBe("bad request");
+      });
+  });
+  test("status:404 when trying to post none existant userName", () => {
+    return request(app)
+      .post("/api/reviews/3/comments")
+      .send({ userName: "TimTam", body: "Rubarb,rubarb,rubarb" })
+      .expect(404)
+      .then((data) => {
+        expect(data._body.msg).toBe("not a valid input");
       });
   });
 });
