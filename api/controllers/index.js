@@ -69,7 +69,7 @@ exports.postComment = (req, res, next) => {
       next(err);
     });
 };
-exports.postReviewVote = (req, res, next) => {
+exports.patchReviewVote = (req, res, next) => {
   const votes = req.body.inc_votes;
   const review_id = req.params.review_id;
   increaseVote(review_id, votes)

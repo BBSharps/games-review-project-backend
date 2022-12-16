@@ -272,7 +272,7 @@ describe("POST /api/reviews/:revied_id/comments", () => {
 describe("PATCH /api/reviews/:review_id", () => {
   test("status: 200 returns the updated review", () => {
     return request(app)
-      .post("/api/reviews/5")
+      .patch("/api/reviews/5")
       .send({ inc_votes: 10 })
       .expect(200)
       .then((data) => {
@@ -294,7 +294,7 @@ describe("PATCH /api/reviews/:review_id", () => {
   });
   test("status: 200 returns the updated review when minused", () => {
     return request(app)
-      .post("/api/reviews/2")
+      .patch("/api/reviews/2")
       .send({ inc_votes: -3 })
       .expect(200)
       .then((data) => {
@@ -316,7 +316,7 @@ describe("PATCH /api/reviews/:review_id", () => {
   });
   test("status:404 when serching for an invalid id in reviews", () => {
     return request(app)
-      .post("/api/reviews/92")
+      .patch("/api/reviews/92")
       .send({ inc_votes: 3 })
       .expect(404)
       .then((data) => {
@@ -325,7 +325,7 @@ describe("PATCH /api/reviews/:review_id", () => {
   });
   test("status:400 when serching for a bad request", () => {
     return request(app)
-      .post("/api/reviews/banana")
+      .patch("/api/reviews/banana")
       .send({ inc_votes: 3 })
       .expect(400)
       .then((data) => {
@@ -334,7 +334,7 @@ describe("PATCH /api/reviews/:review_id", () => {
   });
   test("status:400 when missing information in post request", () => {
     return request(app)
-      .post("/api/reviews/1")
+      .patch("/api/reviews/1")
       .send({})
       .expect(400)
       .then((data) => {
