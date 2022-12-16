@@ -9,7 +9,7 @@ const {
 exports.getReviews = (req, res, next) => {
   const category = req.query.category;
   const sort_by = req.query.sorted_by;
-  let order = req.query.order;
+  const order = req.query.order;
   selectReviews(category, sort_by, order)
     .then((reviews) => {
       res.send({ reviews: reviews });
