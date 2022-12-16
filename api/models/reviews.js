@@ -67,7 +67,6 @@ exports.selectReviewId = (review_id) => {
       [review_id]
     )
     .then((review) => {
-      console.log(review.rows);
       return review.rows;
     });
 };
