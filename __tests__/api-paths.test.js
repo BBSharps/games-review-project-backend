@@ -269,6 +269,79 @@ describe("POST /api/reviews/:revied_id/comments", () => {
       });
   });
 });
+describe("PATCH /api/reviews/:review_id", () => {
+  test("status: 200 returns the updated review", () => {
+    return request(app)
+      .post("/api/reviews/5")
+      .send({ inc_votes: 10 })
+      .expect(200)
+      .then((data) => {
+        const review = data.body.reviewVote;
+        expect(review).toEqual(
+          expect.objectContaining({
+            title: expect.any(String),
+            designer: expect.any(String),
+            owner: expect.any(String),
+            review_id: 5,
+            review_img_url: expect.any(String),
+            category: expect.any(String),
+            created_at: expect.any(String),
+            votes: 15,
+            review_body: expect.any(String),
+          })
+        );
+      });
+  });
+  test("status: 200 returns the updated review when minused", () => {
+    return request(app)
+      .post("/api/reviews/2")
+      .send({ inc_votes: -3 })
+      .expect(200)
+      .then((data) => {
+        const review = data.body.reviewVote;
+        expect(review).toEqual(
+          expect.objectContaining({
+            title: expect.any(String),
+            designer: expect.any(String),
+            owner: expect.any(String),
+            review_id: 2,
+            review_img_url: expect.any(String),
+            category: expect.any(String),
+            created_at: expect.any(String),
+            votes: 2,
+            review_body: expect.any(String),
+          })
+        );
+      });
+  });
+  test("status:404 when serching for an invalid id in reviews", () => {
+    return request(app)
+      .post("/api/reviews/92")
+      .send({ inc_votes: 3 })
+      .expect(404)
+      .then((data) => {
+        expect(data._body.msg).toBe("not a valid id");
+      });
+  });
+  test("status:400 when serching for a bad request", () => {
+    return request(app)
+      .post("/api/reviews/banana")
+      .send({ inc_votes: 3 })
+      .expect(400)
+      .then((data) => {
+        expect(data._body.msg).toBe("bad request");
+      });
+  });
+  test("status:400 when missing information in post request", () => {
+    return request(app)
+      .post("/api/reviews/1")
+      .send({})
+      .expect(400)
+      .then((data) => {
+        expect(data._body.msg).toBe("missing information in POST request");
+      });
+  });
+});
 
 describe("error handling", () => {
   test("status:404 when serching for an incorret path", () => {

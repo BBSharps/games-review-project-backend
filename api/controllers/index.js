@@ -4,7 +4,7 @@ const {
   selectReviewId,
   selectReviewComments,
   newComment,
-  selectUsers,
+  increaseVote,
 } = require("../models/index");
 exports.getCategories = (req, res, next) => {
   selectCategories()
@@ -66,6 +66,19 @@ exports.postComment = (req, res, next) => {
     })
     .catch((err) => {
       console.log(err);
+      next(err);
+    });
+};
+exports.postReviewVote = (req, res, next) => {
+  const votes = req.body.inc_votes;
+  const review_id = req.params.review_id;
+  increaseVote(review_id, votes)
+    .then((reviewVote) => {
+      if (reviewVote === undefined)
+        return Promise.reject({ status: 404, msg: "not a valid id" });
+      res.send({ reviewVote: reviewVote });
+    })
+    .catch((err) => {
       next(err);
     });
 };

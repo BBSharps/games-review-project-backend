@@ -10,6 +10,7 @@ const {
   getReviewId,
   getReviewIdComments,
   postComment,
+  postReviewVote,
 } = require("./controllers/index");
 const app = express();
 app.use(express.json());
@@ -20,6 +21,7 @@ app.get("/api/reviews/:review_id", getReviewId);
 app.get("/api/reviews/:review_id/comments", getReviewIdComments);
 
 app.post("/api/reviews/:review_id/comments", postComment);
+app.post("/api/reviews/:review_id", postReviewVote);
 
 app.use(handleBadPaths);
 app.use(handleCustomErrors);
