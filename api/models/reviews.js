@@ -1,30 +1,24 @@
 const { response } = require("express");
 const db = require("../../db/connection");
 
-exports.selectCategories = () => {
-  return db.query(`SELECT * FROM categories`).then((response) => {
-    return response.rows;
-  });
-};
-
 exports.selectReviews = () => {
   return db
     .query(
       `SELECT 
-  title,
-  designer,
-  owner,
-  reviews.review_id,
-  review_img_url ,
-  category,
-  reviews.created_at,
-  reviews.votes,
- (SELECT COUNT(comment_id) 
-  FROM comments
-  WHERE review_id = reviews.review_id) AS comment_count FROM reviews
-  LEFT JOIN comments ON reviews.review_id = comments.review_id
-  GROUP BY reviews.review_id
-  ORDER BY reviews.created_at DESC`
+    title,
+    designer,
+    owner,
+    reviews.review_id,
+    review_img_url ,
+    category,
+    reviews.created_at,
+    reviews.votes,
+   (SELECT COUNT(comment_id) 
+    FROM comments
+    WHERE review_id = reviews.review_id) AS comment_count FROM reviews
+    LEFT JOIN comments ON reviews.review_id = comments.review_id
+    GROUP BY reviews.review_id
+    ORDER BY reviews.created_at DESC`
     )
     .then((reviews) => {
       return reviews.rows;
@@ -34,30 +28,29 @@ exports.selectReviewId = (review_id) => {
   return db
     .query(
       `SELECT 
-  title,
-  designer,
-  owner,
-  reviews.review_id,
-  review_img_url ,
-  category,
-  reviews.created_at,
-  reviews.votes,review_body
-  FROM reviews 
-  WHERE review_id = $1 `,
+    title,
+    designer,
+    owner,
+    reviews.review_id,
+    review_img_url ,
+    category,
+    reviews.created_at,
+    reviews.votes,review_body
+    FROM reviews 
+    WHERE review_id = $1 `,
       [review_id]
     )
     .then((review) => {
       return review.rows;
     });
 };
-
 exports.selectReviewComments = (review_id) => {
   return db
     .query(
       `SELECT comment_id,comments.votes,comments.created_at,author,body, comments.review_id FROM comments
-    WHERE review_id = $1
-  ORDER BY created_at DESC
- `,
+      WHERE review_id = $1
+    ORDER BY created_at DESC
+   `,
       [review_id]
     )
     .then((comments) => {
@@ -69,8 +62,8 @@ exports.newComment = (review_id, author, body) => {
   return db
     .query(
       `INSERT INTO comments (body,votes,author,review_id,created_at)
-      VALUES
-      ($3,0,$2,$1,$4) RETURNING *`,
+        VALUES
+        ($3,0,$2,$1,$4) RETURNING *`,
       [review_id, author, body, date]
     )
     .then((res) => {
@@ -81,9 +74,9 @@ exports.increaseVote = (review_id, votes) => {
   return db
     .query(
       `UPDATE reviews
-      SET votes = votes + $2
-      WHERE review_id = $1
-      RETURNING *`,
+        SET votes = votes + $2
+        WHERE review_id = $1
+        RETURNING *`,
       [review_id, votes]
     )
     .then((res) => {

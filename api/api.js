@@ -5,13 +5,13 @@ const {
   handleBadPaths,
 } = require("./controllers/handleErrors");
 const {
-  getCategories,
   getReviews,
   getReviewId,
   getReviewIdComments,
   postComment,
   patchReviewVote,
-} = require("./controllers/index");
+} = require("./controllers/reviews");
+const { getCategories } = require("./controllers/categories");
 const app = express();
 app.use(express.json());
 

@@ -1,20 +1,10 @@
 const {
-  selectCategories,
   selectReviews,
   selectReviewId,
   selectReviewComments,
   newComment,
   increaseVote,
-} = require("../models/index");
-exports.getCategories = (req, res, next) => {
-  selectCategories()
-    .then((categories) => {
-      res.send({ categories: categories });
-    })
-    .catch((err) => {
-      next(err);
-    });
-};
+} = require("../models/reviews");
 
 exports.getReviews = (req, res, next) => {
   selectReviews()
