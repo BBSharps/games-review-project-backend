@@ -215,6 +215,7 @@ describe("GET /api/reviews/:review_id", () => {
             created_at: expect.any(String),
             votes: expect.any(Number),
             review_body: expect.any(String),
+            comment_count: "3",
           })
         );
       });
