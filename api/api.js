@@ -11,6 +11,7 @@ const {
   postComment,
   patchReviewVote,
 } = require("./controllers/reviews");
+const { deleteComment } = require("./controllers/comments");
 const { getCategories } = require("./controllers/categories");
 const { getUsers } = require("./controllers/users");
 const app = express();
@@ -25,6 +26,8 @@ app.get("/api/users", getUsers);
 app.post("/api/reviews/:review_id/comments", postComment);
 
 app.patch("/api/reviews/:review_id", patchReviewVote);
+
+app.delete("/api/comments/:comment_id", deleteComment);
 
 app.use(handleBadPaths);
 app.use(handleCustomErrors);
