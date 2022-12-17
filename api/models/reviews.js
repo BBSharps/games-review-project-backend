@@ -59,7 +59,10 @@ exports.selectReviewId = (review_id) => {
     review_img_url ,
     category,
     reviews.created_at,
-    reviews.votes,review_body
+    reviews.votes,review_body,
+    (SELECT COUNT(comment_id) 
+    FROM comments
+    WHERE review_id = reviews.review_id) AS comment_count
     FROM reviews 
     WHERE review_id = $1 `,
       [review_id]
