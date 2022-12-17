@@ -1,3 +1,5 @@
+const categories = require("../../db/data/test-data/categories");
+const { selectCategories } = require("../models/categories");
 const {
   selectReviews,
   selectReviewId,
@@ -7,13 +9,18 @@ const {
 } = require("../models/reviews");
 
 exports.getReviews = (req, res, next) => {
-  selectReviews()
+  const category = req.query.category;
+  const sort_by = req.query.sorted_by;
+  const order = req.query.order;
+  Promise.all([selectCategories(), selectReviews(category, sort_by, order)])
     .then((reviews) => {
-      if (reviews.length === 0) {
-        return Promise.reject({ status: 404, msg: "not a valid id" });
-      } else {
-        res.send({ reviews: reviews });
+      const categoriesCheck = reviews[0].filter((categoryCheck) => {
+        return categoryCheck.slug === category;
+      });
+      if (categoriesCheck.length === 0 && category !== undefined) {
+        return Promise.reject({ status: 400, msg: "bad request" });
       }
+      res.send({ reviews: reviews[1] });
     })
     .catch((err) => {
       next(err);
@@ -55,7 +62,6 @@ exports.postComment = (req, res, next) => {
       res.status(201).send({ comment: results });
     })
     .catch((err) => {
-      console.log(err);
       next(err);
     });
 };

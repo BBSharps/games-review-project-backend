@@ -88,12 +88,112 @@ describe("GET /api/reviews", () => {
         });
       });
   });
-  test("the results should be sorted buy created_at in descending order", () => {
+  test("the results should be sorted by created_at in descending order", () => {
     return request(app)
       .get("/api/reviews")
       .then((data) => {
         const result = data.body.reviews;
         expect(result).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("when a category query is added should only return reviews in that category", () => {
+    return request(app)
+      .get("/api/reviews?category=dexterity")
+      .expect(200)
+      .then((data) => {
+        const reviews = data.body.reviews;
+        expect(reviews).toHaveLength(1);
+        reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              title: expect.any(String),
+              designer: expect.any(String),
+              owner: expect.any(String),
+              review_id: expect.any(Number),
+              review_img_url: expect.any(String),
+              category: "dexterity",
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+  test("when a category query is added but there are 0 reviews in that category should return an empty array", () => {
+    return request(app)
+      .get("/api/reviews?category=children's games")
+      .expect(200)
+      .then((data) => {
+        const reviews = data.body.reviews;
+        expect(reviews).toHaveLength(0);
+      });
+  });
+  test("the results should be sorted by the requestd sort_by or created_at in descending order", () => {
+    return request(app)
+      .get("/api/reviews?sorted_by=designer")
+      .then((data) => {
+        const result = data.body.reviews;
+        expect(result).toBeSortedBy("designer", { descending: true });
+      });
+  });
+  test("the results should be sorted buy the requestd sort_by or created_at in ascending order if order = asc", () => {
+    return request(app)
+      .get("/api/reviews?order=asc")
+      .then((data) => {
+        const result = data.body.reviews;
+        expect(result).toBeSortedBy("created_at", { descending: false });
+      });
+  });
+  test("all querys should be able to work togeather", () => {
+    return request(app)
+      .get(
+        "/api/reviews?category=social deduction&order=asc&sorted_by=designer"
+      )
+      .expect(200)
+      .then((data) => {
+        const reviews = data.body.reviews;
+        expect(reviews).toHaveLength(11);
+        expect(reviews).toBeSortedBy("designer", { descending: false });
+        reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              title: expect.any(String),
+              designer: expect.any(String),
+              owner: expect.any(String),
+              review_id: expect.any(Number),
+              review_img_url: expect.any(String),
+              category: "social deduction",
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+  test("status:400 when given a bad category request", () => {
+    return request(app)
+      .get("/api/reviews?category=banana")
+      .expect(400)
+      .then((data) => {
+        expect(data._body.msg).toBe("bad request");
+      });
+  });
+  test("status:400 when given an invalid column to sort by", () => {
+    return request(app)
+      .get("/api/reviews?sorted_by=banana")
+      .expect(400)
+      .then((data) => {
+        expect(data._body.msg).toBe("not a valid request");
+      });
+  });
+  test("status:400 when given an invalid order", () => {
+    return request(app)
+      .get("/api/reviews?order=banana")
+      .expect(400)
+      .then((data) => {
+        expect(data._body.msg).toBe("not a valid request");
       });
   });
 });
@@ -119,6 +219,7 @@ describe("GET /api/reviews/:review_id", () => {
         );
       });
   });
+
   test("should return only the required review", () => {
     return request(app)
       .get("/api/reviews/4")
@@ -128,7 +229,7 @@ describe("GET /api/reviews/:review_id", () => {
         expect(result.review_id).toBe(4);
       });
   });
-  test("status:404 when serching for an invalid id in reviews", () => {
+  test("status:404 when serching for an id that would be valid but is not in the database", () => {
     return request(app)
       .get("/api/reviews/92")
       .expect(404)
@@ -136,7 +237,7 @@ describe("GET /api/reviews/:review_id", () => {
         expect(data._body.msg).toBe("not a valid id");
       });
   });
-  test("status:400 when serching for a bad request", () => {
+  test("status:400 when serching for a bad id request", () => {
     return request(app)
       .get("/api/reviews/banana")
       .expect(400)
@@ -186,7 +287,7 @@ describe("GET /api/reviews/:review_id/comments", () => {
         expect(comments).toHaveLength(0);
       });
   });
-  test("status:404 when serching for an invalid id in reviews", () => {
+  test("status:404 when serching for an id that would be valid but is not in the database", () => {
     return request(app)
       .get("/api/reviews/92/comments")
       .expect(404)
@@ -314,7 +415,7 @@ describe("PATCH /api/reviews/:review_id", () => {
         );
       });
   });
-  test("status:404 when serching for an invalid id in reviews", () => {
+  test("status:404 when serching for an id  that would be valid but is not in the database", () => {
     return request(app)
       .patch("/api/reviews/92")
       .send({ inc_votes: 3 })

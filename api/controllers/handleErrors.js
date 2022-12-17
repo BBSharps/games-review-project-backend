@@ -5,6 +5,8 @@ exports.handleBadPaths = (err, req, res, next) => {
     res.status(404).send({ msg: "not a valid input" });
   } else if (err.code === "23502") {
     res.status(400).send({ msg: "missing information in POST request" });
+  } else if (err.code === "42703") {
+    res.status(400).send({ msg: "not a valid input" });
   } else {
     next(err);
   }
@@ -18,6 +20,6 @@ exports.handleCustomErrors = (err, req, res, next) => {
 };
 
 exports.handle500 = (err, req, res, next) => {
-  console.log(err);
+  // console.log(err);
   res.status(500).send({ msg: "server error" });
 };

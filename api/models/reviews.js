@@ -1,28 +1,52 @@
 const { response } = require("express");
 const db = require("../../db/connection");
 
-exports.selectReviews = () => {
-  return db
-    .query(
-      `SELECT 
-    title,
-    designer,
-    owner,
-    reviews.review_id,
-    review_img_url ,
-    category,
-    reviews.created_at,
-    reviews.votes,
-   (SELECT COUNT(comment_id) 
-    FROM comments
-    WHERE review_id = reviews.review_id) AS comment_count FROM reviews
-    LEFT JOIN comments ON reviews.review_id = comments.review_id
-    GROUP BY reviews.review_id
-    ORDER BY reviews.created_at DESC`
-    )
-    .then((reviews) => {
-      return reviews.rows;
-    });
+exports.selectReviews = (category, sort_by, order) => {
+  const querys = [];
+  if (order === undefined) order = `desc`;
+  if (sort_by === undefined) sort_by = `reviews.created_at`;
+  if (!["asc", "desc"].includes(order)) {
+    return Promise.reject({ status: 400, msg: "not a valid request" });
+  }
+
+  if (
+    ![
+      "title",
+      "designer",
+      "owner",
+      "category",
+      "votes",
+      "reviews.created_at",
+    ].includes(sort_by)
+  ) {
+    return Promise.reject({ status: 400, msg: "not a valid request" });
+  }
+  let reviews = `SELECT 
+  title,
+  designer,
+  owner,
+  reviews.review_id,
+  review_img_url ,
+  category,
+  reviews.created_at,
+  reviews.votes,
+  (SELECT COUNT(comment_id) 
+  FROM comments
+  WHERE review_id = reviews.review_id) AS comment_count FROM reviews
+  LEFT JOIN comments ON reviews.review_id = comments.review_id
+  `;
+  let orderByText = `GROUP BY reviews.review_id 
+  ORDER BY ${sort_by}`;
+  if (category) {
+    reviews += ` WHERE category = $1`;
+    querys.push(category);
+  }
+
+  reviews += orderByText += ` ${order}`;
+
+  return db.query(reviews, querys).then((reviews) => {
+    return reviews.rows;
+  });
 };
 exports.selectReviewId = (review_id) => {
   return db
