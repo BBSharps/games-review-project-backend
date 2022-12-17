@@ -1,3 +1,5 @@
+const categories = require("../../db/data/test-data/categories");
+const { selectCategories } = require("../models/categories");
 const {
   selectReviews,
   selectReviewId,
@@ -10,9 +12,15 @@ exports.getReviews = (req, res, next) => {
   const category = req.query.category;
   const sort_by = req.query.sorted_by;
   const order = req.query.order;
-  selectReviews(category, sort_by, order)
+  Promise.all([selectCategories(), selectReviews(category, sort_by, order)])
     .then((reviews) => {
-      res.send({ reviews: reviews });
+      const categoriesCheck = reviews[0].filter((categoryCheck) => {
+        return categoryCheck.slug === category;
+      });
+      if (categoriesCheck.length === 0 && category !== undefined) {
+        return Promise.reject({ status: 400, msg: "bad request" });
+      }
+      res.send({ reviews: reviews[1] });
     })
     .catch((err) => {
       next(err);

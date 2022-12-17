@@ -88,7 +88,7 @@ describe("GET /api/reviews", () => {
         });
       });
   });
-  test("the results should be sorted buy created_at in descending order", () => {
+  test("the results should be sorted by created_at in descending order", () => {
     return request(app)
       .get("/api/reviews")
       .then((data) => {
@@ -120,7 +120,16 @@ describe("GET /api/reviews", () => {
         });
       });
   });
-  test("the results should be sorted buy the requestd column in descending order", () => {
+  test("when a category query is added but there are 0 reviews in that category should return an empty array", () => {
+    return request(app)
+      .get("/api/reviews?category=children's games")
+      .expect(200)
+      .then((data) => {
+        const reviews = data.body.reviews;
+        expect(reviews).toHaveLength(0);
+      });
+  });
+  test("the results should be sorted by the requestd sort_by or created_at in descending order", () => {
     return request(app)
       .get("/api/reviews?sorted_by=designer")
       .then((data) => {
@@ -128,7 +137,7 @@ describe("GET /api/reviews", () => {
         expect(result).toBeSortedBy("designer", { descending: true });
       });
   });
-  test("the results should be sorted buy the requestd column in descending order", () => {
+  test("the results should be sorted buy the requestd sort_by or created_at in ascending order if order = asc", () => {
     return request(app)
       .get("/api/reviews?order=asc")
       .then((data) => {
@@ -163,12 +172,12 @@ describe("GET /api/reviews", () => {
         });
       });
   });
-  test("status:404 when given an invalid category", () => {
+  test("status:400 when given a bad category request", () => {
     return request(app)
       .get("/api/reviews?category=banana")
-      .expect(404)
+      .expect(400)
       .then((data) => {
-        expect(data._body.msg).toBe("not found");
+        expect(data._body.msg).toBe("bad request");
       });
   });
   test("status:400 when given an invalid column to sort by", () => {
@@ -220,7 +229,7 @@ describe("GET /api/reviews/:review_id", () => {
         expect(result.review_id).toBe(4);
       });
   });
-  test("status:404 when serching for an invalid id in reviews", () => {
+  test("status:404 when serching for an id that would be valid but is not in the database", () => {
     return request(app)
       .get("/api/reviews/92")
       .expect(404)
@@ -228,7 +237,7 @@ describe("GET /api/reviews/:review_id", () => {
         expect(data._body.msg).toBe("not a valid id");
       });
   });
-  test("status:400 when serching for a bad request", () => {
+  test("status:400 when serching for a bad id request", () => {
     return request(app)
       .get("/api/reviews/banana")
       .expect(400)
@@ -278,7 +287,7 @@ describe("GET /api/reviews/:review_id/comments", () => {
         expect(comments).toHaveLength(0);
       });
   });
-  test("status:404 when serching for an invalid id in reviews", () => {
+  test("status:404 when serching for an id that would be valid but is not in the database", () => {
     return request(app)
       .get("/api/reviews/92/comments")
       .expect(404)
@@ -406,7 +415,7 @@ describe("PATCH /api/reviews/:review_id", () => {
         );
       });
   });
-  test("status:404 when serching for an invalid id in reviews", () => {
+  test("status:404 when serching for an id  that would be valid but is not in the database", () => {
     return request(app)
       .patch("/api/reviews/92")
       .send({ inc_votes: 3 })

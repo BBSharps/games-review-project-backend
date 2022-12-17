@@ -45,8 +45,6 @@ exports.selectReviews = (category, sort_by, order) => {
   reviews += orderByText += ` ${order}`;
 
   return db.query(reviews, querys).then((reviews) => {
-    if (reviews.rows.length === 0)
-      return Promise.reject({ status: 404, msg: "not found" });
     return reviews.rows;
   });
 };
