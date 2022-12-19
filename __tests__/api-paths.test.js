@@ -3,7 +3,6 @@ const { app } = require("../api/api");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data/index");
 const db = require("../db/connection");
-const categories = require("../db/data/test-data/categories");
 const { toBeSortedBy } = require("");
 
 beforeEach(() => seed(testData));
@@ -235,7 +234,7 @@ describe("GET /api/reviews/:review_id", () => {
       .get("/api/reviews/92")
       .expect(404)
       .then((data) => {
-        expect(data._body.msg).toBe("not a valid id");
+        expect(data._body.msg).toBe("id not found");
       });
   });
   test("status:400 when serching for a bad id request", () => {
@@ -293,7 +292,7 @@ describe("GET /api/reviews/:review_id/comments", () => {
       .get("/api/reviews/92/comments")
       .expect(404)
       .then((data) => {
-        expect(data._body.msg).toBe("not a valid id");
+        expect(data._body.msg).toBe("id not found");
       });
   });
   test("status:400 when serching for a bad request", () => {
@@ -343,13 +342,13 @@ describe("POST /api/reviews/:revied_id/comments", () => {
         expect(data._body.msg).toBe("missing information in POST request");
       });
   });
-  test("status:404 when serching for an invalid id in reviews", () => {
+  test("status:404 when given an id that would be valid but is not in the database", () => {
     return request(app)
       .post("/api/reviews/38/comments")
       .send({ userName: "dav3rid", body: "Rubarb,rubarb,rubarb" })
       .expect(404)
       .then((data) => {
-        expect(data._body.msg).toBe("not a valid input");
+        expect(data._body.msg).toBe("not found");
       });
   });
   test("status:400 when serching for a bad request", () => {
@@ -361,13 +360,13 @@ describe("POST /api/reviews/:revied_id/comments", () => {
         expect(data._body.msg).toBe("bad request");
       });
   });
-  test("status:404 when trying to post none existant userName", () => {
+  test("status:404 when trying to post with a none existing userName", () => {
     return request(app)
       .post("/api/reviews/3/comments")
       .send({ userName: "TimTam", body: "Rubarb,rubarb,rubarb" })
       .expect(404)
       .then((data) => {
-        expect(data._body.msg).toBe("not a valid input");
+        expect(data._body.msg).toBe("not found");
       });
   });
 });
@@ -422,7 +421,7 @@ describe("PATCH /api/reviews/:review_id", () => {
       .send({ inc_votes: 3 })
       .expect(404)
       .then((data) => {
-        expect(data._body.msg).toBe("not a valid id");
+        expect(data._body.msg).toBe("id not found");
       });
   });
   test("status:400 when serching for a bad request", () => {
@@ -472,7 +471,33 @@ describe("GET /api/users", () => {
       });
   });
 });
-
+describe("DELETE /api/comments/:comment_id", () => {
+  test("status:204 and returns no content when a delete request is made", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(204)
+      .then((data) => {
+        const response = data.body;
+        expect(response).toEqual({});
+      });
+  });
+  test("status:404 when given an id that would be valid but is not in the database", () => {
+    return request(app)
+      .delete("/api/comments/100")
+      .expect(404)
+      .then((data) => {
+        expect(data._body.msg).toBe("id not found");
+      });
+  });
+  test("status:400 when when given a bad request", () => {
+    return request(app)
+      .delete("/api/comments/banana")
+      .expect(400)
+      .then((data) => {
+        expect(data._body.msg).toBe("bad request");
+      });
+  });
+});
 describe("error handling", () => {
   test("status:404 when serching for an incorret path", () => {
     return request(app).get("/api/not_a_path").expect(404);

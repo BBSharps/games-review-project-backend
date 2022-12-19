@@ -31,7 +31,7 @@ exports.getReviewId = (req, res, next) => {
   selectReviewId(review_id)
     .then((reviewId) => {
       if (reviewId.length === 0) {
-        return Promise.reject({ status: 404, msg: "not a valid id" });
+        return Promise.reject({ status: 404, msg: "id not found" });
       } else {
         res.send({ reviewId: reviewId[0] });
       }
@@ -46,7 +46,7 @@ exports.getReviewIdComments = (req, res, next) => {
   Promise.all([selectReviewId(review_id), selectReviewComments(review_id)])
     .then((results) => {
       if (results[0].length === 0)
-        return Promise.reject({ status: 404, msg: "not a valid id" });
+        return Promise.reject({ status: 404, msg: "id not found" });
       res.send({ comments: results[1] });
     })
     .catch((err) => {
@@ -71,7 +71,7 @@ exports.patchReviewVote = (req, res, next) => {
   increaseVote(review_id, votes)
     .then((reviewVote) => {
       if (reviewVote === undefined)
-        return Promise.reject({ status: 404, msg: "not a valid id" });
+        return Promise.reject({ status: 404, msg: "id not found" });
       res.send({ reviewVote: reviewVote });
     })
     .catch((err) => {
