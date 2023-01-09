@@ -15,6 +15,9 @@ const { deleteComment } = require("./controllers/comments");
 const { getCategories } = require("./controllers/categories");
 const { getUsers } = require("./controllers/users");
 const app = express();
+const cors = require("cors");
+
+app.use(cors());
 app.use(express.json());
 
 app.get("/api/categories", getCategories);
