@@ -11,6 +11,7 @@ const {
   postComment,
   patchReviewVote,
 } = require("./controllers/reviews");
+const { getApi } = require("./controllers/api");
 const { deleteComment } = require("./controllers/comments");
 const { getCategories } = require("./controllers/categories");
 const { getUsers } = require("./controllers/users");
@@ -20,6 +21,7 @@ const cors = require("cors");
 app.use(cors());
 app.use(express.json());
 
+app.get("/api/", getApi);
 app.get("/api/categories", getCategories);
 app.get("/api/reviews", getReviews);
 app.get("/api/reviews/:review_id", getReviewId);
