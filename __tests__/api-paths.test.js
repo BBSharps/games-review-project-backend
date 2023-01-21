@@ -503,7 +503,7 @@ describe("error handling", () => {
     return request(app).get("/api/not_a_path").expect(404);
   });
 });
-describe.only("GET /api/", () => {
+describe("GET /api/", () => {
   test("status:200 and returns an object", () => {
     return request(app)
       .get("/api/")
